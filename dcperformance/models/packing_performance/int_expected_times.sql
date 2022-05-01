@@ -5,13 +5,12 @@
 -- time standards * item id * qty
 {{ config(materialized='table') }}
 
-
 with item_time_standards as
-(select item_number, seconds from dcperformance.int_item_standards),
+(select item_number, seconds from {{ ref('int_item_standards')  }}),
 
 order_qtys as 
 (select order_number, user_id, item_number, sum(quantity) as qty
-from dcperformance.stg_transactions
+from {{ ref('stg_transactions')  }}
 where action_code = 'PKOCLOSE'
 group by order_number, user_id, item_number),
 
