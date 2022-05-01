@@ -6,7 +6,8 @@
 SELECT 
 order_number,
 order_line,
-item_number
+item_number,
+user_id
     {% for action_code in action_codes %}
     ,case when action_code = '{{action_code}}' then timestamp_time end as {{action_code}}_ts
     {% endfor %}
