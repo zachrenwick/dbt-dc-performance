@@ -13,7 +13,7 @@ select
 order_number,
 order_line,
 item_number,
-{{ dbt_utils.pivot('timestamp_time',  dbt_utils.get_column_values(table=ref('stg_transactions'), column='action_code')) }}
+{{ dbt_utils.pivot('action_code',  dbt_utils.get_column_values(table=ref('stg_transactions'), column='action_code'), suffix='_ts') }}
 
 from {{ ref('stg_transactions')  }}
 group by order_number,

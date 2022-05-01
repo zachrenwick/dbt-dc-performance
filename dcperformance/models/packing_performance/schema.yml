@@ -4,3 +4,6 @@ version: 2
 models:
   - name: my_first_dbt_model
     description: "A starter dbt model"
+
+  - name: stg_transactions
+    description: "Staging table where data types are defined and loaded into database from csv seeds"
