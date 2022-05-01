@@ -24,7 +24,12 @@ from dcperformance.stg_transactions
 --where user_id = 'USER13'
 group by order_number, user_id)
 
-select current.order_number, current.user_id, current.max_ts, prior.prior_order_ts, (max_ts - prior_order_ts) as order_elapsed_time
+select current.order_number, 
+current.user_id, 
+current.max_ts, 
+prior.prior_order_ts, 
+(max_ts - prior_order_ts) as order_elapsed_time,
+{{ dbt_utils.datediff("prior_order_ts", "max_ts",'second') }} as seconds_elapsed
 from order_packed_ts current
 left join prior_order_times  prior on prior.order_number = current.order_number
 order by max_ts
