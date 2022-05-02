@@ -1,9 +1,7 @@
 
 {{ config(materialized='table') }}
 
-SELECT 
-item_number,
-lower(replace(department,'-','')) as department
-from {{ ref('stg_items')  }}
-
-
+SELECT
+    item_number,
+    lower(replace(department, '-', '')) AS department
+FROM {{ ref('stg_items')  }}

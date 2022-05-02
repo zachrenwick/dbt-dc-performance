@@ -2,9 +2,14 @@
 
 
 with time_standards as (
-select * from {{ ref('int_time_standards')  }})
+    select * from {{ ref('int_time_standards')  }}
+)
 
 
-select item_number, department, time_standard, seconds
-from {{ ref('int_items')  }} item 
-left join time_standards ts on ts.time_standard = item.department
+select
+    item_number,
+    department,
+    time_standard,
+    seconds
+from {{ ref('int_items')  }} as item
+left join time_standards on time_standards.time_standard = item.department

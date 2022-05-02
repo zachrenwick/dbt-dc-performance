@@ -1,4 +1,3 @@
-
 /*
     Welcome to your first dbt model!
     Did you know that you can also configure models directly within SQL files?
@@ -9,11 +8,8 @@
 
 {{ config(materialized='table') }}
 
-SELECT 
-"MATERIAL" AS item_number,
-"DEPARTMENT" AS department
+SELECT
+    "MATERIAL" AS ITEM_NUMBER,
+    "DEPARTMENT" AS DEPARTMENT
 
-from {{ ref('article_master')  }}
-
-
-
+FROM {{ ref('article_master')  }}
