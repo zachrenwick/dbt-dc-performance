@@ -1,5 +1,8 @@
 -- we have actual time, now calculate expected
 -- going to need the departments query and the baseline time standa
+
+-- need to add gift timing and basic packing times to this query
+
 {{ config(materialized='table') }}
 
 with expected_pack_times as (select * from {{ ref('int_expected_times')  }}
