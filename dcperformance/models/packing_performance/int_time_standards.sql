@@ -2,15 +2,16 @@
 {{ config(materialized='table') }}
 
 
-with base_query
+with unpivot as 
+({{ dbt_utils.unpivot(ref('stg_time_standards'), cast_to='decimal', field_name='time_standard', value_name='seconds') }})
+
+,final
 as (
     select
         seconds,
-        (replace(time_standard, 'standard', '')) as time_standard
-    from {{ ref('stg_time_standards_unpivot')  }}
+        lower(replace(replace(time_standard, 'standard', ''),'_', '')) as time_standard
+    from unpivot
 )
 
-select
-    seconds,
-    lower(replace(time_standard, '_', '')) as time_standard
-from base_query
+
+select * from final

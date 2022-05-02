@@ -8,7 +8,7 @@ with expected_pack_times as (select * from {{ ref('int_expected_times')  }}
 select
     dcp.order_number,
     dcp.user_id,
-    dcp.max_ts,
+    dcp.order_pack_ts,
     dcp.prior_order_ts,
     dcp.order_elapsed_time,
     dcp.seconds_elapsed,

@@ -11,5 +11,5 @@ select
     department,
     time_standard,
     seconds
-from {{ ref('int_items')  }} as item
+from {{ ref('stg_items')  }} as item
 left join time_standards on time_standards.time_standard = item.department
