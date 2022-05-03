@@ -1,6 +1,4 @@
--- we have actual time, now calculate expected
-
--- need to add the standard times for each 
+-- need to add the standard times for each (set up standard pack time)  ++ gift qty time
 -- also add in gift tag
 
 
