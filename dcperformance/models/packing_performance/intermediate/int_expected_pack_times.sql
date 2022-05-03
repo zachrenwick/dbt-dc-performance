@@ -1,45 +1,69 @@
--- need to add the standard times for each (set up standard pack time)  ++ gift qty time
--- also add in gift tag
-
+--union basicpack, gift records and order qtys into one table, 
+--to be joined against the time standards unpivot
 
 {{ config(materialized='table') }}
 
-with item_time_standards as (
+
+-- the first union can be modified to change assumptions around how much setup time is needed per order
+with other_items_and_order_qtys
+as(
+select distinct order_number, 
+user_id,
+'basicpack' as item,
+1 as quantity -- 1 'basicpack' per order
+from {{ ref('stg_transactions')  }} 
+where action_code = 'PKOCLOSE' 
+
+union
+
+select
+order_number, -- not distinct as an order can have multiple gift items 
+user_id,
+'giftitem' as item,
+quantity
+from {{ ref('stg_transactions')  }} 
+where action_code = 'PKOCLOSE'
+and gift_flag = '1'   
+
+union all
+
+select
+    order_number,
+    user_id,
+    item_number::text as item,
+    sum(quantity) as quantity
+    from {{ ref('stg_transactions')  }} 
+    where action_code = 'PKOCLOSE'
+    group by order_number, user_id, item
+    
+),
+
+item_time_standards as (
 
     select
-        item_number,
+        coalesce(item_number::text, time_standard) as item,
         seconds
-    from {{ ref('stg_items')  }} as item
-    left join
-        {{ ref('int_time_standards')  }} as time_standards on
+    from {{ ref('int_time_standards')  }}  as time_standards 
+        left join {{ ref('stg_items')  }}  as item
+        on
             time_standards.time_standard = item.department 
 ),
 
 
-order_qtys as (select
-    order_number,
-    user_id,
-    item_number,
-    sum(quantity) as item_qty
-    from {{ ref('stg_transactions')  }}
-    where action_code = 'PKOCLOSE'
-    group by order_number, user_id, item_number
-),
-
-expected_by_order_item as (
+final as (
     select
-        order_qtys.item_number,
-        order_qtys.order_number,
-        order_qtys.user_id,
-        item_qty,
-        seconds,
-        item_qty * seconds as expected_packing_seconds
+        other_items_and_order_qtys.item,
+        other_items_and_order_qtys.order_number,
+        other_items_and_order_qtys.user_id,
+        other_items_and_order_qtys.quantity,
+        ts.seconds,
+        other_items_and_order_qtys.quantity * ts.seconds as expected_packing_seconds
 
-    from order_qtys
+    from other_items_and_order_qtys
     left join
-        item_time_standards on
-            item_time_standards.item_number = order_qtys.item_number
+        item_time_standards ts on
+            ts.item = other_items_and_order_qtys.item
 )
 
 
-select * from expected_by_order_item
+select * from final
