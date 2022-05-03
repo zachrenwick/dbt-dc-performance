@@ -11,13 +11,13 @@ models:
           - not_null
 
 
-  - name: int_order_pack_times
+  - name: int_actual_pack_times
     description: "Intermediate query used to calculate actual order packing times by order number"
     columns:
-      - name: order_number
+      - name: order_number_user_id
         tests: 
-          - unique
           - not_null
+          - unique
 
 
   - name: stg_transactions

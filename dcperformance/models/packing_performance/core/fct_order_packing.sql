@@ -1,38 +1,31 @@
--- we have actual time, now calculate expected
--- going to need the departments query and the baseline time standa
-
--- need to add gift timing and basic packing times to this query
-
 {{ config(materialized='table') }}
 
-with expected_pack_times as (select * from {{ ref('int_expected_pack_times')  }}
+with expected_pack_times as (
+        
+    select order_number, 
+    user_id, 
+    sum(expected_packing_seconds) as expected_packing_seconds
+    from {{ ref('int_expected_pack_times')  }}
+    group by order_number, user_id
+)
+,
+actual_pack_times as (select * from  {{ ref('int_actual_pack_times')  }}),
+
+final as (
+select
+    apt.order_number,
+    apt.user_id,
+    apt.order_pack_ts,
+    apt.last_order_ts,
+    apt.seconds_elapsed ,
+    ept.expected_packing_seconds, 
+    (apt.seconds_elapsed - ept.expected_packing_seconds)::real  as packing_seconds_variance
+
+from actual_pack_times as apt
+left join
+    expected_pack_times ept on ept.order_number = apt.order_number
+                           and ept.user_id = apt.user_id
+
 )
 
-
-
-select
-    dcp.order_number,
-    dcp.user_id,
-    dcp.order_pack_ts,
-    dcp.last_order_ts,
-    --dcp.order_elapsed_time,
-    sum(dcp.seconds_elapsed) as seconds_elapsed,
-    sum(
-        expected_pack_times.expected_packing_seconds
-    ) as expected_packing_seconds,
-    (
-        sum(
-            dcp.seconds_elapsed
-        ) - sum(expected_pack_times.expected_packing_seconds)
-    ) as seconds_variance
-
-from {{ ref('int_actual_pack_times')  }} as dcp
-left join
-    expected_pack_times on expected_pack_times.order_number = dcp.order_number
-                           and expected_pack_times.user_id = dcp.user_id
-
-group by dcp.order_number,
-    dcp.user_id,
-    dcp.order_pack_ts,
-    dcp.last_order_ts
-  --  dcp.order_elapsed_time
+select * from final

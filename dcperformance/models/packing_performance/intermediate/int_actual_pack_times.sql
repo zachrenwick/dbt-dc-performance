@@ -38,6 +38,7 @@ left join prior_order_times as prior on prior.order_number = current.order_numbe
 select 
 order_number,
 user_id,
+order_number||user_id as order_number_user_id,
 order_pack_ts,
 last_order_ts,
 (order_pack_ts - last_order_ts)  as order_elapsed_time,
