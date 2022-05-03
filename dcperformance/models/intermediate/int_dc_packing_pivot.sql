@@ -1,6 +1,4 @@
 
-{{ config(materialized='table') }}
-
 {% set column_names = dbt_utils.get_filtered_columns_in_relation(from=ref('int_transactions_pivot'), except=["order_number", "order_line", "item_number", "user_id"]) %}
 
 select

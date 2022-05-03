@@ -1,0 +1,24 @@
+
+version: 2
+
+models:
+  - name: fct_order_packing
+    description: "DC packing time metrics broken down by order number and user_id"
+    columns:
+      - name: order_number
+        tests: 
+          - unique
+          - not_null
+
+
+  - name: int_actual_pack_times
+    description: "Intermediate query used to calculate actual order packing times by order number"
+    columns:
+      - name: order_number_user_id
+        tests: 
+          - not_null
+          - unique
+
+
+  - name: stg_transactions
+    description: "Staging table where data types are defined and loaded into database from csv seeds"

@@ -17,6 +17,3 @@ SELECT
 
 from {{ ref('transactions')  }}
 where "QUANTITY" <> '?'
-
-
-
