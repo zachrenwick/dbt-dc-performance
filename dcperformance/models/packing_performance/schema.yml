@@ -2,8 +2,23 @@
 version: 2
 
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: fct_order_packing
+    description: "DC packing time metrics broken down by order number and user_id"
+    columns:
+      - name: order_number
+        tests: 
+          - unique
+          - not_null
+
+
+  - name: int_order_pack_times
+    description: "Intermediate query used to calculate actual order packing times by order number"
+    columns:
+      - name: order_number
+        tests: 
+          - unique
+          - not_null
+
 
   - name: stg_transactions
     description: "Staging table where data types are defined and loaded into database from csv seeds"

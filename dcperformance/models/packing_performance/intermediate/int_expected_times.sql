@@ -1,21 +1,19 @@
 -- we have actual time, now calculate expected
 
--- going to need the departments query and the baseline time standards
--- intermediate query to calc expected packing time
--- time standards * item id * qty
-
-
 -- need to add the standard times for each 
 -- also add in gift tag
 
 
 {{ config(materialized='table') }}
 
-with item_time_standards as (select
+with item_time_standards as (
+    
+    select
     item_number,
     seconds
-    from {{ ref('int_item_standards')  }}
-),
+from {{ ref('stg_items')  }} as item
+left join {{ ref('int_time_standards')  }} as time_standards on time_standards.time_standard = item.department ),
+
 
 order_qtys as (select
     order_number,
@@ -38,20 +36,9 @@ expected_by_order_item as (
 
     from order_qtys
     left join
-        item_time_standards on
-            item_time_standards.item_number = order_qtys.item_number
+        item_time_standards its on
+            its.item_number = order_qtys.item_number
 )
 
 
 select * from expected_by_order_item
-
-
---,final_query as (select
---   order_number,
---   sum(expected_packing_seconds) as total_expected_order_packing_seconds
---    from expected_by_order_item
---    group by order_number
---)
-
-
---select * from final_query
