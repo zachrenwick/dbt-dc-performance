@@ -5,12 +5,15 @@
 {{ config(materialized='table') }}
 
 with item_time_standards as (
-    
+
     select
-    item_number,
-    seconds
-from {{ ref('stg_items')  }} as item
-left join {{ ref('int_time_standards')  }} as time_standards on time_standards.time_standard = item.department ),
+        item_number,
+        seconds
+    from {{ ref('stg_items')  }} as item
+    left join
+        {{ ref('int_time_standards')  }} as time_standards on
+            time_standards.time_standard = item.department 
+),
 
 
 order_qtys as (select
@@ -34,8 +37,8 @@ expected_by_order_item as (
 
     from order_qtys
     left join
-        item_time_standards its on
-            its.item_number = order_qtys.item_number
+        item_time_standards on
+            item_time_standards.item_number = order_qtys.item_number
 )
 
 

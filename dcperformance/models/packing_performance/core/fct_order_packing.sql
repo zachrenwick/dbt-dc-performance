@@ -16,14 +16,20 @@ select
     dcp.order_pack_ts,
     dcp.last_order_ts,
     --dcp.order_elapsed_time,
-    sum(dcp.seconds_elapsed) seconds_elapsed,
-    sum(ept.expected_packing_seconds) as expected_packing_seconds,
-    (sum(dcp.seconds_elapsed) - sum(ept.expected_packing_seconds)) as seconds_variance
+    sum(dcp.seconds_elapsed) as seconds_elapsed,
+    sum(
+        expected_pack_times.expected_packing_seconds
+    ) as expected_packing_seconds,
+    (
+        sum(
+            dcp.seconds_elapsed
+        ) - sum(expected_pack_times.expected_packing_seconds)
+    ) as seconds_variance
 
 from {{ ref('int_actual_pack_times')  }} as dcp
 left join
-    expected_pack_times ept on ept.order_number = dcp.order_number
-      and ept.user_id = dcp.user_id
+    expected_pack_times on expected_pack_times.order_number = dcp.order_number
+                           and expected_pack_times.user_id = dcp.user_id
 
 group by dcp.order_number,
     dcp.user_id,
