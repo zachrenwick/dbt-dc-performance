@@ -5,7 +5,7 @@
 
 {{ config(materialized='table') }}
 
-with expected_pack_times as (select * from {{ ref('int_expected_times')  }}
+with expected_pack_times as (select * from {{ ref('int_expected_pack_times')  }}
 )
 
 
@@ -20,7 +20,7 @@ select
     sum(ept.expected_packing_seconds) as expected_packing_seconds,
     (sum(dcp.seconds_elapsed) - sum(ept.expected_packing_seconds)) as seconds_variance
 
-from {{ ref('int_order_pack_times')  }} as dcp
+from {{ ref('int_actual_pack_times')  }} as dcp
 left join
     expected_pack_times ept on ept.order_number = dcp.order_number
       and ept.user_id = dcp.user_id
